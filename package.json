@@ -11,5 +11,8 @@
         "postcss": "^8.1.14",
         "prettier": "2.7.1",
         "vite": "^2.9.11"
+    },
+    "dependencies": {
+        "filepond": "^4.30.4"
     }
 }

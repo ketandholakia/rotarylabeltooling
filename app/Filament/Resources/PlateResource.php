@@ -32,13 +32,14 @@ class PlateResource extends Resource
         return $form
             ->schema([
                 TextInput::make('plateno')->required(),
+                TextInput::make('run')->required(),
 
                 Select::make('plates_media_id')
                     ->label('Media')
                     ->options(Media::all()->pluck('mediatype', 'id'))
                     ->searchable()
                     ->required(),
-                TextInput::make('remark')->required(),
+                TextInput::make('remark'),
 
             ]);
     }
@@ -50,8 +51,9 @@ class PlateResource extends Resource
                 TextColumn::make('plateno')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('run'),
                 TextColumn::make('media.mediatype'),
-                TextColumn::make('remarks'),
+                TextColumn::make('remark')->searchable(),
             ])
             ->filters([
                 //

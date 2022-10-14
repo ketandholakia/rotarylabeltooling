@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources;
 
+
+
+use App\Filament\Resources\CustomerResource\Widgets\StatsOverview;
+
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\Customer;
@@ -17,6 +21,7 @@ use Filament\Tables\Columns\BooleanColumn;
 use Filament\Forms\Components\TextInput;
 
 
+
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -30,6 +35,8 @@ class CustomerResource extends Resource
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('city')->required(),
+
+
 
             ]);
     }
@@ -62,6 +69,16 @@ class CustomerResource extends Resource
             RelationManagers\OrdersRelationManager::class,
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            StatsOverview::class,
+        ];
+    }
+
+
+
 
     public static function getPages(): array
     {

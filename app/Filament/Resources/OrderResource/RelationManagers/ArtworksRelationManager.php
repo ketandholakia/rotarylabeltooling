@@ -9,6 +9,9 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Models\Artwork;
+
 
 class ArtworksRelationManager extends RelationManager
 {
@@ -23,10 +26,11 @@ class ArtworksRelationManager extends RelationManager
 
                 Forms\Components\TextInput::make('description')->required(),
 
-                Forms\Components\TextInput::make('requiredqty')->required(),
+                Forms\Components\TextInput::make('requiredqty')->default(0)->required(),
                 Forms\Components\TextInput::make('jobrun'),
-                Forms\Components\TextInput::make('labelrepeat'),
                 Forms\Components\TextInput::make('printedqty'),
+                Forms\Components\TextInput::make('labelrepeat'),
+
                 // Forms\Components\TextInput::make('artworks_media_id'),
                 Forms\Components\Select::make('awstatus')
                     ->options([
@@ -36,9 +40,20 @@ class ArtworksRelationManager extends RelationManager
                         'platesent' => 'Plate Sent',
                         'sentforapproval' => 'Sent for Approval',
                         'noartworkfile' => 'No Artwork File',
-                    ])->required(),
-                Forms\Components\Toggle::make('prepressstage')->label('Prepress Done'),
+                    ])->required()->default('Pending'),
+
+
+                Forms\Components\Select::make('priority')
+                    ->options([
+                        'high' => 'High',
+                        'medium' => 'Medium',
+                        'low' => 'Low',
+
+                    ])->required()->default('medium'),
+
+
                 Forms\Components\TextInput::make('remark'),
+                Forms\Components\Toggle::make('prepressstage')->label('Prepress Done'),
             ]);
     }
 
@@ -49,10 +64,17 @@ class ArtworksRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('description')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('requiredqty'),
-                Tables\Columns\BooleanColumn::make('prepressstage')->label('Prepress Done')->sortable(),
+                Tables\Columns\TextColumn::make('requiredqty')->label('R. Qty'),
+                Tables\Columns\TextColumn::make('printedqty')->label('Prt Qty'),
+                Tables\Columns\TextColumn::make('Balance')->label('Bal Qty')
+                    ->getStateUsing(function (Artwork $record) {
+                        // return whatever you need to show
+                        return $record->printedqty - $record->requiredqty;
+                    }),
+                Tables\Columns\TextColumn::make('remark')->label('Ref'),
+                Tables\Columns\BooleanColumn::make('prepressstage')->label('Prepress')->sortable(),
 
-                Tables\Columns\BadgeColumn::make('awstatus')
+                Tables\Columns\BadgeColumn::make('awstatus')->label('Status')
                     ->colors([
                         'warning' => 'Pending',
                         'warning' => 'sentforapproval',
@@ -61,7 +83,8 @@ class ArtworksRelationManager extends RelationManager
                         'success' => 'Plate Sent',
                         'warning' => 'noartworkfile',
                     ])->sortable(),
-                Tables\Columns\TextColumn::make('remark'),
+
+
 
             ])
             ->filters([
@@ -76,6 +99,9 @@ class ArtworksRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
+                FilamentExportBulkAction::make('export')
+
             ]);
     }
 }

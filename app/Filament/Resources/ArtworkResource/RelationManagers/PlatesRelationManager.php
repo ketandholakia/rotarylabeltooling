@@ -23,6 +23,7 @@ class PlatesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('plateno')
                     ->required()
                     ->maxLength(255),
+
             ]);
     }
 
@@ -45,5 +46,5 @@ class PlatesRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }    
+    }
 }

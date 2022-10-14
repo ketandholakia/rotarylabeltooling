@@ -12,3 +12,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+Route::get('changepassword', function() {
+    $user = App\Models\User::where('email', 'admin@laravel.com')->first();
+    $user->password = Hash::make('123456');
+    $user->save();
+  
+    echo 'Password changed successfully.';
+});

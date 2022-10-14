@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
+use App\Filament\Resources\CustomerResource\Widgets\StatsOverview;
 use App\Filament\Resources\OrderResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -15,5 +16,10 @@ class ListOrders extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return OrderResource::getWidgets();
     }
 }

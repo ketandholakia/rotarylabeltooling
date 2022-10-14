@@ -11,7 +11,7 @@ use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 class Plate extends Model
 {
     use HasFactory;
-    protected $fillable =   ['plateno', 'plates_media_id'];
+    protected $fillable =   ['plateno', 'plates_media_id', 'run'];
 
 
     public function media(): BelongsTo

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Artwork extends Model
 {
     use HasFactory;
-    protected $fillable = ['description', 'artworks_order_id', 'artworks_plate_id', 'requiredqty', 'jobrun', 'labelrepeat', 'printedqty', 'remark', 'prepressstage', 'artworks_media_id', 'awstatus'];
+    protected $fillable = ['description', 'artworks_order_id', 'artworks_plate_id', 'requiredqty', 'jobrun', 'labelrepeat', 'printedqty', 'remark', 'prepressstage', 'artworks_media_id', 'type', 'awstatus', 'priority'];
 
     public function order(): BelongsTo
     {

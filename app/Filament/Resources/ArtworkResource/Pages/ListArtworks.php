@@ -5,6 +5,8 @@ namespace App\Filament\Resources\ArtworkResource\Pages;
 use App\Filament\Resources\ArtworkResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Konnco\FilamentImport\Actions\ImportAction;
+use Konnco\FilamentImport\ImportField;
 
 class ListArtworks extends ListRecords
 {
@@ -14,6 +16,12 @@ class ListArtworks extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return ArtworkResource::getWidgets();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+
 use App\Filament\Resources\ArtworkResource\Pages;
 use App\Filament\Resources\ArtworkResource\RelationManagers;
 use App\Models\Artwork;
@@ -22,9 +23,15 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\BadgeColumn;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-
-
-
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\Facades\Date;
+use Filament\Tables\Filters\TernaryFilter;
+use Webbingbrasil\FilamentAdvancedFilter\Filters\NumberFilter;
+use Webbingbrasil\FilamentAdvancedFilter\Filters\TextFilter;
+use Filament\Forms\Components\Grid;
+use Konnco\FilamentImport\Actions\ImportAction;
+use Konnco\FilamentImport\ImportField;
+use App\Filament\Resources\ArtworkResource\Widgets\StatsOverview;
 
 
 
@@ -34,10 +41,22 @@ class ArtworkResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationGroup = 'Artworks';
+    protected static ?string $recordTitleAttribute = 'description';
+
+
+    protected function isTablePaginationEnabled(): bool
+    {
+        return false;
+    }
+
 
     public static function form(Form $form): Form
     {
+
+
         return $form
+
+
             ->schema([
                 TextInput::make('description')->required(),
 
@@ -45,20 +64,30 @@ class ArtworkResource extends Resource
                     ->label('Order')
                     ->options(Order::all()->pluck('orderno', 'id'))
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->hint("[Go to Order](" . url("/orders/") . ")"),
                 TextInput::make('requiredqty')->required(),
                 // TextInput::make('jobrun'),
                 // TextInput::make('labelrepeat'),
-                // TextInput::make('printedqty'),
+                TextInput::make('printedqty'),
+                TextInput::make('remark'),
+
                 Select::make('artworks_plate_id')
                     ->label('Plate ID')
                     ->options(Plate::all()->pluck('plateno', 'id'))
-                    ->searchable()
-                    ->required(),
+                    ->searchable(),
+
+
+                Select::make('type')
+                    ->options([
+                        'sheetform' => 'Sheetform',
+                        'rollform' => 'Rollform',
+
+                    ]),
 
 
 
-                TextInput::make('remark'),
+
                 Select::make('awstatus')
                     ->options([
                         'pending' => 'Pending',
@@ -68,6 +97,17 @@ class ArtworkResource extends Resource
                         'sentforapproval' => 'Sent for Approval',
                         'noartworkfile' => 'No Artwork File',
                     ]),
+
+
+                Select::make('priority')
+                    ->options([
+                        'high' => 'High',
+                        'medium' => 'Medium',
+                        'low' => 'Low',
+
+                    ]),
+
+
 
                 Toggle::make('prepressstage')->label('Prepress Done'),
                 // TextInput::make('artworks_media_id'),
@@ -91,10 +131,18 @@ class ArtworkResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->label('Description'),
-                TextColumn::make('requiredqty'),
+                TextColumn::make('requiredqty')->default('0')
+                    ->searchable(),
                 // TextColumn::make('jobrun'),
                 // TextColumn::make('labelrepeat'),
-                // TextColumn::make('printedqty'),
+                TextColumn::make('printedqty'),
+                TextColumn::make('Balance')
+                    ->getStateUsing(function (Artwork $record) {
+                        // return whatever you need to show
+                        return $record->printedqty - $record->requiredqty;
+                    }),
+
+
                 TextColumn::make('order.orderno'),
 
 
@@ -107,24 +155,38 @@ class ArtworkResource extends Resource
                         'success' => 'Printed',
                         'success' => 'Plate Sent',
                         'warning' => 'noartworkfile',
-                    ])->sortable(),
+                    ]),
                 BooleanColumn::make('prepressstage')->label('Prepress Done')->sortable(),
-                TextColumn::make('remark'),
-                TextColumn::make('updated_at'),
+                TextColumn::make('remark')->searchable(),
+                TextColumn::make('updated_at')->sortable(),
+                TextColumn::make('created_at')->sortable(),
 
 
-
-
-
-
-
-
-
-
-            ])->defaultSort('id', 'desc')
+            ])->defaultSort('created_at', 'desc')
 
             ->filters([
-                //
+                SelectFilter::make('artworks_order_id')->relationship('order', 'orderno'),
+                SelectFilter::make('awstatus')
+                    ->options([
+                        'pending' => 'Pending',
+                        'sentforapproval' => 'Sent for Approval',
+                        'Approved' => 'Approved',
+                        'Printed' => 'Printed',
+                        'Plate Sent' => 'Plate Sent',
+                        'noartworkfile' => 'No Artwork File',
+                    ]),
+
+                TernaryFilter::make('prepressstage'),
+                NumberFilter::make('requiredqty'),
+                SelectFilter::make('priority')
+                    ->options([
+                        'high' => 'high',
+                    ]),
+
+
+
+
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -136,6 +198,13 @@ class ArtworkResource extends Resource
 
 
             ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            StatsOverview::class,
+        ];
     }
 
     public static function getRelations(): array
