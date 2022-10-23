@@ -66,18 +66,6 @@ class ArtworkResource extends Resource
                     ->searchable()
                     ->required()
                     ->hint("[Go to Order](" . url("/orders/") . ")"),
-                TextInput::make('requiredqty')->required(),
-                // TextInput::make('jobrun'),
-                // TextInput::make('labelrepeat'),
-                TextInput::make('printedqty'),
-                TextInput::make('remark'),
-
-                Select::make('artworks_plate_id')
-                    ->label('Plate ID')
-                    ->options(Plate::all()->pluck('plateno', 'id'))
-                    ->searchable(),
-
-
                 Select::make('type')
                     ->options([
                         'sheetform' => 'Sheetform',
@@ -85,8 +73,16 @@ class ArtworkResource extends Resource
 
                     ]),
 
+                TextInput::make('requiredqty')->required(),
+                Select::make('artworks_plate_id')
+                    ->label('Plate ID')
+                    ->options(Plate::all()->pluck('plateno', 'id'))
+                    ->searchable(),
 
 
+                // TextInput::make('jobrun'),
+                // TextInput::make('labelrepeat'),
+                TextInput::make('printedqty'),
 
                 Select::make('awstatus')
                     ->options([
@@ -97,6 +93,15 @@ class ArtworkResource extends Resource
                         'sentforapproval' => 'Sent for Approval',
                         'noartworkfile' => 'No Artwork File',
                     ]),
+
+
+                TextInput::make('remark'),
+
+
+
+
+
+
 
 
                 Select::make('priority')
